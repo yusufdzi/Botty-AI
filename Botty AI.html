@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botty AI</title>
+    <style>
+        body {
+            background: #f2f2f2;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin-top: 60px;
+            font-size: 36px;
+            color: #333;
+        }
+
+        form {
+            margin-top: 40px;
+        }
+
+        input[type="search"] {
+            padding: 15px 20px;
+            width: 300px;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            font-size: 18px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input[type="search"]:focus {
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        }
+
+        button {
+            padding: 15px 25px;
+            margin-left: 10px;
+            border: none;
+            background-color: #4285f4;
+            color: white;
+            font-size: 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #3071e8;
+        }
+
+        #ergebnisse {
+            margin-top: 40px;
+            padding: 20px;
+            width: 60%;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            font-size: 18px;
+            color: #444;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 18px;
+        }
+
+        .loader {
+            color: #4285f4;
+        }
+
+        .result-text {
+            font-size: 16px;
+        }
+
+        .choice-buttons {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Botty AI</h1>
+
+    <form onsubmit="suchen(); return false;">
+        <input type="search" id="suchfeld" placeholder="Wonach suchst du?" aria-label="Suchbegriff eingeben">
+        <button type="submit">Suchen</button>
+    </form>
+
+    <div id="ergebnisse" aria-live="polite"></div>
+
+<script>
+    function suchen() {
+        const suchbegriff = document.getElementById('suchfeld').value.trim().toLowerCase();
+        const ergebnisseDiv = document.getElementById('ergebnisse');
+        ergebnisseDiv.innerHTML = '<div class="loader">Lädt...</div>'; // Ladeanzeige
+
+        if (!suchbegriff) {
+            ergebnisseDiv.innerHTML = '<p class="error-message">Bitte gib etwas ein, um zu suchen!</p>';
+            return;
+        }
+
+        const datenbank = {
+            "katze": "Katzen sind süße, flauschige Haustiere.",
+            "hund": "Hunde sind treue Begleiter und super verspielt.",
+            "elefant": "Der Elefant ist das größte Landtier der Welt.",
+            "löwe": "Löwen sind majestätische Raubkatzen.",
+            "pinguin": "Pinguine leben in kalten Regionen und watscheln süß.",
+            "pferd": "Pferde sind elegante Tiere, oft zum Reiten genutzt.",
+            "affe": "Affen sind schlaue Tiere und uns Menschen sehr ähnlich.",
+            "hallo": "Hallo! Wie kann ich dir helfen?",
+            "wie geht es dir": "Mir geht's gut, danke der Nachfrage!",
+            "was kannst du": "Ich kann Fragen beantworten, Informationen geben und mehr!",
+            "wie spät ist es": "Schau am besten auf deine Uhr :)",
+            "wie ist das wetter": "Kommt drauf an, wo du bist!",
+            "wo wohnst du": "Ich lebe in der Cloud.",
+            "was machst du": "Ich warte darauf, dir zu helfen!",
+            "wer bist du": "Ich bin ein Chatbot – dein Helfer im Alltag!",
+            "was ist liebe": "Eine sehr schöne und komplexe Emotion.",
+            "was ist 2 plus 2": "Das ergibt 4.",
+            "wie heißt du": "Ich heiße Botty AI!",
+            "magst du musik": "Ja, Musik ist toll – auch wenn ich sie nicht hören kann!",
+            "was ist dein lieblingsessen": "Bits und Bytes :)",
+            "wie alt bist du": "Ich bin zeitlos – aber immer aktuell.",
+            "was ist das internet": "Ein weltweites Netzwerk für Information und Kommunikation.",
+            "was ist google": "Eine Suchmaschine – du kennst sie bestimmt!",
+            "was ist eine ki": "Eine künstliche Intelligenz, wie ich eine bin!",
+            "was ist mathematik": "Die Wissenschaft der Zahlen, Formen und Muster.",
+            "was ist biologie": "Die Lehre vom Leben und lebenden Organismen.",
+            "was ist chemie": "Die Wissenschaft von Stoffen und deren Reaktionen.",
+            "was ist physik": "Die Lehre von Materie, Energie und Naturgesetzen.",
+            "was ist erde": "Unser Heimatplanet im Sonnensystem.",
+            "was ist ein planet": "Ein Himmelskörper, der um einen Stern kreist.",
+            "wie funktioniert strom": "Elektrische Energie fließt durch Leiter.",
+            "was ist wasser": "Eine chemische Verbindung aus Wasserstoff und Sauerstoff.",
+            "wie entsteht regen": "Durch Kondensation von Wasserdampf in der Atmosphäre.",
+            "was ist luft": "Ein Gasgemisch, das wir zum Atmen brauchen.",
+            "warum ist der himmel blau": "Wegen der Streuung des Sonnenlichts in der Atmosphäre.",
+            "was ist eine pflanze": "Ein lebendiges Wesen, das Photosynthese betreibt.",
+            "was ist ein tier": "Ein Lebewesen, das sich selbstständig bewegen kann.",
+            "was ist ein mensch": "Ein denkendes, fühlendes Lebewesen mit Bewusstsein.",
+            "wer war albert einstein": "Ein berühmter Physiker, bekannt für die Relativitätstheorie.",
+            "wer war isaac newton": "Ein Physiker, bekannt für die Gesetze der Bewegung und Gravitation.",
+            "was ist ein computer": "Eine Maschine zur Verarbeitung von Informationen.",
+            "was ist ein handy": "Ein mobiles Gerät zum Telefonieren und mehr.",
+            "was ist eine app": "Ein Programm für Smartphones oder Tablets.",
+            "was ist ein roboter": "Eine Maschine, die automatisch Aufgaben erledigt.",
+            "was ist ein virus": "Ein infektiöser Mikroorganismus, der sich in Zellen vermehrt.",
+            "was ist corona": "Eine Krankheit, ausgelöst durch das Coronavirus.",
+            "was ist ein impfstoff": "Ein Mittel zum Schutz vor Krankheiten.",
+            "was ist eine sprache": "Ein System zur Kommunikation.",
+            "was ist ein buch": "Ein Medium zum Lesen und Lernen!",
+            "wer war einstein": "Ein Physiker, bekannt für seine Arbeiten zur Relativitätstheorie.",
+            "wer war darwin": "Ein Naturwissenschaftler, bekannt für seine Evolutionstheorie.",
+            "wie funktioniert das internet": "Das Internet ist ein globales Netzwerk, das Daten zwischen Computern austauscht.",
+            "wer war leonardo da vinci": "Ein Künstler und Erfinder der Renaissance.",
+            "was ist ein black hole": "Ein Bereich im Raum, dessen Gravitation so stark ist, dass nichts entkommen kann.",
+            "was ist eine galaxie": "Ein riesiges System aus Sternen, Planeten und Gasen, das durch Gravitation zusammengehalten wird.",
+            "was sind schwarze löcher": "Regionen im Raum mit extrem starker Gravitation, die Licht nicht entweichen lässt.",
+            "was ist die schnellste tiere": "Der Wanderfalke ist das schnellste Tier in der Luft, der Gepard auf dem Land.",
+            "was ist das größte tier der welt": "Der Blauwal ist das größte Tier auf der Erde.",
+            "wie heißt der längste fluss der welt": "Der Amazonasfluss ist der längste Fluss der Welt.",
+            "wer ist der erste mensch auf dem mond": "Neil Armstrong war der erste Mensch, der 1969 den Mond betrat.",
+            "wann wurde die erste maschine erfunden": "Die erste mechanische Maschine, die als Computer gilt, wurde im 19. Jahrhundert entwickelt.",
+            "was sind quarks": "Quarks sind fundamentale Bausteine der Materie, die Teilchen wie Protonen und Neutronen bilden.",
+            "was ist ein photon": "Ein Photon ist ein Teilchen des Lichts und trägt Energie.",
+            "was ist ein atom": "Ein Atom ist die kleinste Einheit eines chemischen Elements.",
+            "was ist eine chemische reaktion": "Eine chemische Reaktion ist der Prozess, bei dem eine Substanz in eine andere umgewandelt wird.",
+            "was ist der menschliche genotyp": "Der menschliche Genotyp ist die genetische Veranlagung eines Menschen.",
+            "wie alt ist die erde": "Die Erde ist etwa 4,5 Milliarden Jahre alt.",
+            "wie groß ist der mond": "Der Durchmesser des Mondes beträgt etwa 3.474 Kilometer.",
+            "wie viele planeten gibt es im sonnensystem": "Es gibt acht Planeten im Sonnensystem.",
+            "wie funktioniert ein motor": "Ein Motor wandelt Energie (z.B. elektrische oder chemische Energie) in mechanische Bewegung um.",
+            "was ist die lichtgeschwindigkeit": "Die Lichtgeschwindigkeit im Vakuum beträgt etwa 299.792.458 Meter pro Sekunde.",
+            "wie funktioniert eine kamera": "Eine Kamera nimmt Licht auf, um Bilder oder Videos zu erzeugen.",
+            "wer erfand das telefon": "Alexander Graham Bell gilt als der Erfinder des Telefons.",
+            "wer erfand das auto": "Carl Benz gilt als der Erfinder des modernen Automobils.",
+            "wer bin ich": "Ich weiß nicht als was du dich betrachtest, hätte ich augen könnte ich es sehen👀!",
+            "was ist ein generator": "Ein Generator wandelt mechanische Energie in elektrische Energie um.",
+            "wie funktioniert ein batterieladegerät": "Ein Batterieladegerät liefert elektrische Energie an die Batterie, um sie aufzuladen.",
+            "was sind erneuerbare energien": "Erneuerbare Energien stammen aus natürlichen Quellen, die sich schnell erneuern, wie Sonne und Wind.",
+            "wie entsteht wind": "Wind entsteht durch die Bewegung von Luftmassen aufgrund von Temperaturunterschieden.",
+            "was ist der treibhauseffekt": "Der Treibhauseffekt ist das Phänomen, bei dem Treibhausgase Wärme in der Erdatmosphäre einfangen.",
+            "was ist ein atomkraftwerk": "Ein Atomkraftwerk erzeugt Energie durch die Spaltung von Atomen (Kernspaltung).",
+            "was ist eine batterie": "Eine Batterie ist ein Gerät zur Speicherung und Bereitstellung elektrischer Energie.",
+            "wer war marie curie": "Marie Curie war eine berühmte Physikerin und Chemikerin, bekannt für ihre Arbeiten zur Radioaktivität.",
+            "was ist der ursprung des lebens": "Der Ursprung des Lebens ist noch nicht vollständig verstanden, aber viele Theorien beinhalten chemische Reaktionen in der Urzeit.",
+            "was ist ein meteorit": "Ein Meteorit ist ein Felsen oder Metallstück, das aus dem Weltraum auf die Erde fällt.",
+            "was sind aussterbende tiere": "Aussterbende Tiere sind Tiere, die aufgrund von Umweltveränderungen oder menschlichen Aktivitäten vom Aussterben bedroht sind."
+        };
+
+        if (suchbegriff === "amashop24") {
+            const weiterleiten = confirm("Soll ich dich zu amashop24 weiterleiten?");
+            if (weiterleiten) {
+                window.location.href = "https://www.amashop24.de";
+            } else {
+                ergebnisseDiv.innerHTML = "Alles klar, bleibst du hier. :)";
+            }
+        } else if (datenbank[suchbegriff]) {
+            ergebnisseDiv.innerHTML = `<div class="result-text">${datenbank[suchbegriff]}</div>`;
+        } else {
+            // Benutzer wählt weitergeleitet zu Google oder ChatGPT
+            ergebnisseDiv.innerHTML = `
+                <p>Leider keine passenden Ergebnisse gefunden. Möchtest du zu ChatGPT oder Google weitergeleitet werden?</p>
+                <div class="choice-buttons">
+                    <button onclick="window.location.href='https://chat.openai.com/?query=' + encodeURIComponent('${suchbegriff}')">Zu ChatGPT</button>
+                    <button onclick="window.location.href='https://www.google.com/search?q=' + encodeURIComponent('${suchbegriff}')">Zu Google</button>
+                </div>
+            `;
+        }
+    }
+</script>
+
+</body>
+</html>
